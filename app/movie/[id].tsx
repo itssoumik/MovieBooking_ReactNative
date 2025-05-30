@@ -11,16 +11,9 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Star, Clock, Calendar } from "lucide-react-native";
 import { useMovieStore } from "@/store/movie-store";
-//import { showtimes } from "@/mocks/showtimes";
-//import { theaters } from "@/mocks/theaters";
 import Colors from "@/constants/colors";
-import Button from "@/components/Button";
 import GenreTag from "@/components/GenreTag";
 import DateSelector from "@/components/DateSelector";
-//import ShowtimeCard from "@/components/ShowtimeCard";
-//import { useBookingStore } from "@/store/booking-store";
-//import { Showtime } from "@/types";
-
 export default function MovieDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();

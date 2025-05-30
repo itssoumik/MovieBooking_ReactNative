@@ -1,6 +1,6 @@
 import { create } from "zustand";
+import firestore from "@react-native-firebase/firestore";
 import { Movie } from "@/types";
-import { movies as mockMovies } from "@/mocks/movies";
 
 interface MovieState {
   movies: Movie[];
@@ -19,17 +19,20 @@ export const useMovieStore = create<MovieState>((set, get) => ({
   selectedMovie: null,
   isLoading: false,
   error: null,
-  
+
   fetchMovies: async () => {
     set({ isLoading: true, error: null });
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const snapshot = await firestore().collection("Movies").get();
+      const movies: Movie[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Movie[];
+
       set({
-        movies: mockMovies,
-        filteredMovies: mockMovies,
+        movies,
+        filteredMovies: movies,
         isLoading: false
       });
     } catch (error) {
@@ -39,15 +42,22 @@ export const useMovieStore = create<MovieState>((set, get) => ({
       });
     }
   },
-  
+
   getMovieById: async (id: string) => {
     set({ isLoading: true, error: null });
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const movie = mockMovies.find(m => m.id === id) || null;
+      const doc = await firestore().collection("Movies").doc(`movie_${id}`).get();
+
+      if (!doc.exists) {
+        throw new Error("Movie not found");
+      }
+
+      const movie = {
+        id: doc.id,
+        ...doc.data()
+      } as Movie;
+
       set({ selectedMovie: movie, isLoading: false });
       return movie;
     } catch (error) {
@@ -58,31 +68,31 @@ export const useMovieStore = create<MovieState>((set, get) => ({
       return null;
     }
   },
-  
+
   filterMovies: (query, genres = [], languages = []) => {
     const { movies } = get();
-    
+
     let filtered = [...movies];
-    
+
     if (query) {
       const lowerQuery = query.toLowerCase();
-      filtered = filtered.filter(movie => 
+      filtered = filtered.filter(movie =>
         movie.title.toLowerCase().includes(lowerQuery)
       );
     }
-    
-    if (genres && genres.length > 0) {
-      filtered = filtered.filter(movie => 
+
+    if (genres.length > 0) {
+      filtered = filtered.filter(movie =>
         genres.some(genre => movie.genres.includes(genre))
       );
     }
-    
-    if (languages && languages.length > 0) {
-      filtered = filtered.filter(movie => 
+
+    if (languages.length > 0) {
+      filtered = filtered.filter(movie =>
         languages.some(language => movie.languages.includes(language))
       );
     }
-    
+
     set({ filteredMovies: filtered });
   }
 }));

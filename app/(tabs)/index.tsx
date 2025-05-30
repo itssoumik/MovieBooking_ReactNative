@@ -10,7 +10,7 @@ import {
   Image as RNImage
 } from "react-native";
 import { useRouter } from "expo-router";
-import { MapPin, ChevronDown } from "lucide-react-native";
+//import { MapPin, ChevronDown } from "lucide-react-native";
 import { useMovieStore } from "@/store/movie-store";
 import Colors from "@/constants/colors";
 import MovieCard from "@/components/MovieCard";
