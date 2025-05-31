@@ -3,9 +3,10 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { StatusBar } from "react-native";
 import { ErrorBoundary } from "./error-boundary";
+import { getAuth, onAuthStateChanged, FirebaseAuthTypes } from "@react-native-firebase/auth";
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
@@ -45,6 +46,21 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+   const [initializing, setInitializing] = useState(true);
+   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+
+  // Handle user state changes
+  function handleAuthStateChanged(user: FirebaseAuthTypes.User | null) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = onAuthStateChanged(getAuth(), handleAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
+
+  if (initializing) return null;
   return (
     <Stack
       screenOptions={{
@@ -60,8 +76,13 @@ function RootLayoutNav() {
         },
       }}
     >
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />  
+      <Stack.Protected guard={!!user}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack.Protected>
+
+      <Stack.Protected guard={!user}>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      </Stack.Protected>
       <Stack.Screen 
         name="movie/[id]" 
         options={{ 
