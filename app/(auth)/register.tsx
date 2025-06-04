@@ -21,11 +21,19 @@ export default function RegisterScreen() {
     setLoading(true);
     try{
       await auth().createUserWithEmailAndPassword(email, password);
-      router.push("/(auth)/login");   
+      router.replace("/(tabs)");   
     }
     catch (error: any) {
       const err=error as FirebaseError;
-      alert(`Registration failed: ${err.message}`);
+      if (err.code === 'auth/email-already-in-use') {
+        alert("This email is already registered. Please use a different email.");
+      } else if (err.code === 'auth/invalid-email') {
+        alert("Invalid email format. Please enter a valid email.");
+      } else if (err.code === 'auth/weak-password') {
+        alert("Weak password. Please choose a stronger password.");
+      } else {
+        console.error("Registration error:", {err});
+      }
     } finally {
       setLoading(false);
     }

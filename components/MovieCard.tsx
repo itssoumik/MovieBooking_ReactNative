@@ -23,7 +23,7 @@ export default function MovieCard({ movie, size = "small" }: MovieCardProps) {
       onPress={handlePress}
     >
       <Image 
-        source={{ uri: movie.poster }} 
+        source={size==="large"?{ uri: movie.backdrop }:{ uri: movie.poster }} 
         style={[styles.poster, size === "large" ? styles.largePoster : styles.smallPoster]} 
         resizeMode="cover"
       />
@@ -51,7 +51,7 @@ export default function MovieCard({ movie, size = "small" }: MovieCardProps) {
               <Text style={styles.votes}>({movie.votes})</Text>
             </View>
             
-            <Text style={styles.duration}>{Math.floor(movie.duration / 60)}h {movie.duration % 60}m</Text>
+            <Text style={styles.duration}>{Math.floor(movie.duration / 60)}h {movie.duration % 60}min</Text>
           </View>
         )}
       </View>
@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     height: 190,
   },
   large: {
+    margin: 8,
     width: "100%",
     height: 240,
   },

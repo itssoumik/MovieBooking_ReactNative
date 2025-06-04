@@ -23,7 +23,18 @@ export default function LoginScreen() {
       router.replace("/(tabs)");
     } catch (error: any) {
       const err = error as FirebaseError;
+      if (err.code === 'auth/user-not-found') {
+        alert("User not found. Please check your email or register.");
+      } else if (err.code === 'auth/wrong-password') {
+        alert("Incorrect password. Please try again.");
+      } else if (err.code === 'auth/invalid-email') {
+        alert("Invalid email format. Please enter a valid email.");
+      } else if (err.code === 'auth/invalid-credential') {
+      alert("Invalid credentials. Please check your email and password.");
+      }else {
       alert(`Login failed: ${err.message}`);
+      }
+      //console.error("Login error:", err);
     } finally {
       setLoading(false);
     }

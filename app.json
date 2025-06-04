@@ -15,8 +15,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/App-logo.png",
+        "backgroundColor": "#ff6b00"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.galaxy.ShowBooking",
@@ -37,7 +37,7 @@
           "image": "./assets/images/App-logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#ff6b00"
         }
       ]
     ],
