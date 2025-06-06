@@ -7,6 +7,9 @@ import { useRouter } from "expo-router";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import firestore from "@react-native-firebase/firestore";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function LoginScreen() {
   //const auth = getAuth();
@@ -20,6 +23,23 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await auth().signInWithEmailAndPassword(email, password);
+      await AsyncStorage.setItem("userEmail", email); // Store email
+
+    const userDoc = await firestore().collection("Users").doc(email).get();
+    const userData = userDoc.data();
+
+    if (userData) {
+      useAuthStore.setState({
+        user: {
+          id: email,
+          name: userData.username,
+          email,
+          avatar: userData.avatar,
+          
+        },
+        isAuthenticated: true
+      });
+    }
       router.replace("/(tabs)");
     } catch (error: any) {
       const err = error as FirebaseError;

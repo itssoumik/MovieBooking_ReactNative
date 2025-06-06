@@ -12,3 +12,10 @@ export interface Movie {
   price: number; 
 }
 
+export interface User {
+  id: string; // same as email
+  name: string; // from 'username' field in Firestore
+  email: string; // also used as document ID
+  avatar?: string; // URL of avatar image
+}
+
