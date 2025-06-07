@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import firestore from "@react-native-firebase/firestore";
 import { User } from "@/types";
 import auth from "@react-native-firebase/auth";
+import { uploadToCloudinary } from "@/utils/uploadToCloudinary";
 
 interface AuthState {
   user: User | null;
@@ -57,38 +58,45 @@ export const useAuthStore = create<AuthState>()(
       },
 
       register: async (name, email, password) => {
-        set({ isLoading: true, error: null });
+  set({ isLoading: true, error: null });
 
-        try {
-          const defaultAvatar = "https://res.cloudinary.com/dcyah4eaw/image/upload/v1749206662/placeholder-profile-icon-orange-6cgz191l5ancz0mu_giautn.png";
+  try {
+    const defaultAvatar =
+      "https://res.cloudinary.com/dcyah4eaw/image/upload/v1749227842/ChatGPT_Image_Jun_6_2025_10_06_30_PM_ftujqz.png";
 
-          // Save new user to Firestore
-          await firestore().collection("Users").doc(email).set({
-            username: name,
-            avatar: defaultAvatar,
-          });
+    // ✅ Step 1: Create the user in Firebase Auth
+    await auth().createUserWithEmailAndPassword(email, password);
 
-          await AsyncStorage.setItem("userEmail", email);
+    // ✅ Step 2: Save the profile in Firestore
+    await firestore().collection("Users").doc(email).set({
+      username: name,
+      avatar: defaultAvatar,
+    });
 
-          const user: User = {
-            id: email,
-            email,
-            name,
-            avatar: defaultAvatar,
-          };
+    // ✅ Step 3: Save email locally
+    await AsyncStorage.setItem("userEmail", email);
 
-          set({
-            user,
-            isAuthenticated: true,
-            isLoading: false,
-          });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : "Registration failed",
-            isLoading: false,
-          });
-        }
-      },
+    // ✅ Step 4: Sync Zustand state
+    const user: User = {
+      id: email,
+      email,
+      name,
+      avatar: defaultAvatar,
+    };
+
+    set({
+      user,
+      isAuthenticated: true,
+      isLoading: false,
+    });
+  } catch (error) {
+    set({
+      error: error instanceof Error ? error.message : "Registration failed",
+      isLoading: false,
+    });
+  }
+},
+
 
       logout: async () => {
         try {
@@ -109,24 +117,38 @@ export const useAuthStore = create<AuthState>()(
       },
 
       updateProfile: async (userData) => {
-        set({ isLoading: true, error: null });
-        try {
-          const email = await AsyncStorage.getItem("userEmail");
-          if (!email) throw new Error("No user email found in storage");
+  set({ isLoading: true, error: null });
 
-          await firestore().collection("Users").doc(email).update(userData);
+  try {
+    const email = await AsyncStorage.getItem("userEmail");
+    if (!email) throw new Error("No user email found in storage");
 
-          set((state) => ({
-            user: state.user ? { ...state.user, ...userData } : null,
-            isLoading: false,
-          }));
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : "Update failed",
-            isLoading: false,
-          });
-        }
-      },
+    let updatedData = { ...userData };
+
+    // 👇 Upload avatar if it's a local URI
+    if (userData.avatar && userData.avatar.startsWith("file://")) {
+      const cloudinaryUrl = await uploadToCloudinary(userData.avatar);
+      updatedData.avatar = cloudinaryUrl;
+    }
+
+    // 🔄 Update Firestore
+    await firestore().collection("Users").doc(email).update({
+      username: userData.name,
+      avatar: userData.avatar,
+    });
+
+    // 🔄 Update local Zustand state
+    set((state) => ({
+      user: state.user ? { ...state.user, ...updatedData } : null,
+      isLoading: false,
+    }));
+  } catch (error) {
+    set({
+      error: error instanceof Error ? error.message : "Update failed",
+      isLoading: false,
+    });
+  }
+},
     }),
     {
       name: "auth-storage",

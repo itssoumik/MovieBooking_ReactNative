@@ -33,7 +33,7 @@ export default function profile() {
 
   
   const handleEditProfile = () => {
-    router.push("/(tabs)/profile");
+    router.push("/profile/edit");
   };
   
   const handleMyBookings = () => {
@@ -150,10 +150,16 @@ const styles = StyleSheet.create({
   header: {
     alignItems: "center",
     padding: 24,
-    backgroundColor: Colors.background,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    backgroundColor: Colors.card,
+    borderRadius: 24,
+    marginHorizontal: 16,
+    marginTop: 8,
     marginBottom: 16,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
   },
   avatar: {
     width: 100,
@@ -192,19 +198,24 @@ const styles = StyleSheet.create({
   section: {
     //padding: 8,
     //marginBottom: 5,
+    marginHorizontal: 16,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
     color: Colors.text,
     marginBottom: 16,
+    marginLeft: 5,
   },
   menuItem: {
     flexDirection: "row",
     backgroundColor: Colors.card,
     borderRadius: 12,
     padding: 16,
-    marginBottom: 8,
+    marginBottom: 12,
   },
   menuIconContainer: {
     width: 40,

@@ -90,6 +90,13 @@ function RootLayoutNav() {
           headerBackTitle: "Back"
         }} 
       />
+      <Stack.Screen 
+        name="profile/edit" 
+        options={{ 
+          title: "Edit Profile",
+          headerBackTitle: "Back"
+        }}
+      />
       
     </Stack>
   );

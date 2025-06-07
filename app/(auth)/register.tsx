@@ -1,27 +1,29 @@
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Colors from "@/constants/colors";
-import auth from '@react-native-firebase/auth';
 import { FirebaseError } from "firebase/app";
 import { useRouter } from "expo-router";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
-import React, { useState } from "react";
+import { Eye, EyeOff, Lock, Mail, User2 } from "lucide-react-native";
+import React, { use, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {useAuthStore} from "@/store/auth-store";
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { register } = useAuthStore(); // Use the register function from auth store
   //const auth=getAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleRegistration = async () => {
     
     setLoading(true);
-    try{
-      await auth().createUserWithEmailAndPassword(email, password);
-      router.replace("/(tabs)");   
+    try {
+      await register(username, email, password);
+      router.replace("/(tabs)"); // Navigate to main app
     }
     catch (error: any) {
       const err=error as FirebaseError;
@@ -57,6 +59,14 @@ export default function RegisterScreen() {
       </View>
 
       <View style={styles.form}>
+        <Input
+          label="Username"
+          placeholder="Enter your username"
+          value={username}
+          onChangeText={setUsername}
+          leftIcon={<User2 size={20} color={Colors.textSecondary} />}
+        />
+
         <Input
           label="Email"
           placeholder="Enter your email"

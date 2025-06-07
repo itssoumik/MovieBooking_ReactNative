@@ -14,10 +14,13 @@ import { useMovieStore } from "@/store/movie-store";
 import Colors from "@/constants/colors";
 import GenreTag from "@/components/GenreTag";
 import DateSelector from "@/components/DateSelector";
+import YoutubeIframe from "react-native-youtube-iframe";
+
 export default function MovieDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { getMovieById, selectedMovie, isLoading } = useMovieStore();
+  const [playing, setPlaying] = useState(true);
   
   const [selectedDate, setSelectedDate] = useState("");
   
@@ -43,6 +46,10 @@ export default function MovieDetailScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
+
+        
+
+
         <Image 
           source={{ uri: selectedMovie.backdrop || selectedMovie.poster }} 
           style={styles.backdrop}
@@ -128,9 +135,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   header: {
-    height: 200,
-    position: "relative",
-  },
+  height: 200,
+  position: "relative", // Helps force re-render
+},
+
   backdrop: {
     width: "100%",
     height: "100%",
