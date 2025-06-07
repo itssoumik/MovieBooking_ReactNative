@@ -10,6 +10,7 @@ export interface Movie {
   rating: number;
   votes: number;
   price: number; 
+  ytCode?: string; // YouTube video code
 }
 
 export interface User {

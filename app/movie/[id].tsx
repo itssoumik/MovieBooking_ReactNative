@@ -47,14 +47,22 @@ export default function MovieDetailScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
 
-        
+        <YoutubeIframe  
+          height={200}
+          play={playing}
+          videoId={selectedMovie.ytCode}
+          webViewProps={{
+            allowsFullscreenVideo: true,
+            style: {backgroundColor: Colors.background},
+          }}
+        /> 
 
 
-        <Image 
+        {/* <Image 
           source={{ uri: selectedMovie.backdrop || selectedMovie.poster }} 
           style={styles.backdrop}
           resizeMode="cover"
-        />
+        /> */}
         
         <View style={styles.posterContainer}>
           <Image 
