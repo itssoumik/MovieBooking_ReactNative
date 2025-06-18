@@ -15,13 +15,18 @@ import Colors from "@/constants/colors";
 import GenreTag from "@/components/GenreTag";
 import DateSelector from "@/components/DateSelector";
 import YoutubeIframe from "react-native-youtube-iframe";
+import ShowtimeCard from "@/components/ShowtimeCard";
+import {theaters} from "@/mocks/theaters";
+import { Showtime } from "@/types"
+import { showtimes } from "@/mocks/showtimes";
+import { useBookingStore } from "@/store/booking-store";
 
 export default function MovieDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { getMovieById, selectedMovie, isLoading } = useMovieStore();
   const [playing, setPlaying] = useState(true);
-  
+  const { selectShowtime } = useBookingStore();
   const [selectedDate, setSelectedDate] = useState("");
   
   useEffect(() => {
@@ -42,6 +47,16 @@ export default function MovieDetailScreen() {
       </View>
     );
   }
+
+  const handleSelectShowtime = async (showtime: Showtime) => {
+    await selectShowtime(showtime.id);
+    router.push(`/theater/${showtime.theaterId}`);
+    
+  };
+
+  const movieShowtimes = showtimes.filter(
+    showtime => showtime.movieId === id
+  );
   
   return (
     <ScrollView style={styles.container}>
@@ -126,6 +141,20 @@ export default function MovieDetailScreen() {
             selectedDate={selectedDate}
             onSelectDate={setSelectedDate}
           />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Showtimes</Text>
+          
+          {theaters.map(theater => (
+            <ShowtimeCard
+              key={theater.id}
+              theater={theater}
+              showtimes={movieShowtimes}
+              date={selectedDate}
+              onSelectShowtime={handleSelectShowtime}
+            />
+          ))}
         </View>
       </View>
     </ScrollView>

@@ -97,6 +97,13 @@ function RootLayoutNav() {
           headerBackTitle: "Back"
         }}
       />
+      <Stack.Screen 
+        name="theater/[id]" 
+        options={{ 
+          title: "Seat Map",
+          headerBackTitle: "Back"
+        }}
+      />
       
     </Stack>
   );

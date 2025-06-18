@@ -20,3 +20,37 @@ export interface User {
   avatar?: string; // URL of avatar image
 }
 
+export interface Theater {
+  id: string;
+  name: string;
+  location: string;
+}
+
+export interface Showtime {
+  id: string;
+  movieId: string;
+  theaterId: string;
+  date: string;
+  time: string;
+  price: number;
+}
+
+export interface Seat {
+  id: string;
+  row: string;
+  number: number;
+  type: "standard" | "premium" ;
+  isAvailable: boolean;
+}
+
+export interface Booking {
+  id: string;
+  userId: string;
+  movieId: string;
+  theaterId: string;
+  showtimeId: string;
+  seats: string[]; // Array of seat IDs
+  totalAmount: number;
+  bookingDate: string;
+  status: "confirmed" | "cancelled";
+}
