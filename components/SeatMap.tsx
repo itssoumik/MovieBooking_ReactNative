@@ -32,43 +32,46 @@ export default function SeatMap({
         <Text style={styles.screenText}>SCREEN</Text>
       </View>
       
-      <ScrollView contentContainerStyle={styles.seatsContainer}>
-        {rows.map((row) => (
-          <View key={row} style={styles.row}>
-            <Text style={styles.rowLabel}>{row}</Text>
-            
-            <View style={styles.seats}>
-              {seatsByRow[row].map((seat) => {
-                const isSelected = selectedSeats.some(s => s.id === seat.id);
-                
-                return (
-                  <Pressable
-                    key={seat.id}
-                    style={[
-                      styles.seat,
-                      styles[`${seat.type}Seat`],
-                      !seat.isAvailable && styles.unavailableSeat,
-                      isSelected && styles.selectedSeat
-                    ]}
-                    onPress={() => onToggleSeat(seat)}
-                    disabled={!seat.isAvailable}
-                  >
-                    <Text 
-                      style={[
-                        styles.seatNumber,
-                        !seat.isAvailable && styles.unavailableSeatText,
-                        isSelected && styles.selectedSeatText
-                      ]}
-                    >
-                      {seat.number}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </View>
-        ))}
-      </ScrollView>
+      <ScrollView horizontal>
+  <ScrollView contentContainerStyle={styles.seatsContainer}>
+    {rows.map((row) => (
+      <View key={row} style={styles.row}>
+        <Text style={styles.rowLabel}>{row}</Text>
+
+        <View style={styles.seats}>
+          {seatsByRow[row].map((seat) => {
+            const isSelected = selectedSeats.some(s => s.id === seat.id);
+
+            return (
+              <Pressable
+                key={seat.id}
+                style={[
+                  styles.seat,
+                  styles[`${seat.type}Seat`],
+                  !seat.isAvailable && styles.unavailableSeat,
+                  isSelected && styles.selectedSeat
+                ]}
+                onPress={() => onToggleSeat(seat)}
+                disabled={!seat.isAvailable}
+              >
+                <Text 
+                  style={[
+                    styles.seatNumber,
+                    !seat.isAvailable && styles.unavailableSeatText,
+                    isSelected && styles.selectedSeatText
+                  ]}
+                >
+                  {seat.number}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+    ))}
+  </ScrollView>
+</ScrollView>
+
       
       <View style={styles.legend}>
         <View style={styles.legendItem}>
@@ -107,27 +110,33 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textSecondary,
   },
-  seatsContainer: {
-    gap: 16,
+    seatsContainer: {
     paddingBottom: 16,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 16,
   },
+  seats: {
+    flexDirection: "row",
+    gap: 8,
+    // REMOVE: flexWrap, justifyContent to keep seats in one row
+  },
+
   rowLabel: {
     width: 20,
     fontSize: 14,
     fontWeight: "600",
     color: Colors.text,
   },
-  seats: {
-    flex: 1,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    justifyContent: "center",
-  },
+  // seats: {
+  //   flex: 1,
+  //   flexDirection: "row",
+  //   flexWrap: "wrap",
+  //   gap: 8,
+  //   justifyContent: "center",
+  // },
   seat: {
     width: 24,
     height: 24,
@@ -142,9 +151,7 @@ const styles = StyleSheet.create({
   premiumSeat: {
     backgroundColor: "#E6F7FF",
   },
-  // reclinerSeat: {
-  //   backgroundColor: "#FFF0F5",
-  // },
+  // -
   unavailableSeat: {
     backgroundColor: Colors.inactive,
   },

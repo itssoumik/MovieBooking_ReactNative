@@ -4,7 +4,7 @@ import { useMovieStore } from "@/store/movie-store";
 export const generateShowtimes = (): Showtime[] => {
   const showtimes: Showtime[] = [];
   const theaters = ["1", "2", "3", "4"];
-  const movies = ["1", "2", "3", "4", "5"];
+  const movies = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
   const times = ["09:30 AM", "12:30 PM", "03:30 PM", "06:30 PM"];
   //const { getMovieById, selectedMovie, isLoading } = useMovieStore();
 
@@ -35,7 +35,7 @@ export const generateShowtimes = (): Showtime[] => {
               theaterId,
               date,
               time,
-              price:  200 // Random price between 150 and 250     selectedMovie?.price ??
+              price:  200 
             });
             id++;
           }

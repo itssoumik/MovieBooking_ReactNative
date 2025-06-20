@@ -27,7 +27,7 @@ const generateSeats = (showtimeId: string): Seat[] => {
   const rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
   
   rows.forEach(row => {
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= 10; i++) {
       const seatType = 
         
         row > "F" ? "premium" : "standard";
