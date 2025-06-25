@@ -39,7 +39,7 @@ export interface Seat {
   id: string;
   row: string;
   number: number;
-  type: "standard" | "premium" ;
+  type: "standard" | "premium" |"vanish";
   isAvailable: boolean;
 }
 

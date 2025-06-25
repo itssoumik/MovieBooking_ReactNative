@@ -4,21 +4,21 @@ export const theaters: Theater[] = [
   {
     id: "1",
     name: "PVR Elante mall",
-    location: "Chandigarh"
+    location: "Kolkata"
   },
   {
     id: "2",
     name: "PVR Centra mall",
-    location: "Chandigarh"
+    location: "Kolkata"
   },
   {
     id: "3",
     name: "Wave cinemas",
-    location: "Chandigarh"
+    location: "Kolkata"
   },
   {
     id: "4",
     name: "PVR DT Mall",
-    location: "Chandigarh"
+    location: "Kolkata"
   }
 ];

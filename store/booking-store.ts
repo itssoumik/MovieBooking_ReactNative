@@ -31,7 +31,7 @@ const generateSeats = (showtimeId: string): Seat[] => {
       const seatType = 
         
         row > "F" ? "premium" : "standard";
-      
+      if(row!="A"&& row!="B"){
       seats.push({
         id: `${showtimeId}-${row}${i}`,
         row,
@@ -40,6 +40,26 @@ const generateSeats = (showtimeId: string): Seat[] => {
         isAvailable: Math.random() > 0.3 // 70% of seats are available
       });
     }
+    else if (row=="A"){
+      seats.push({
+        id: `${showtimeId}-${row}${i}`,
+        row,
+        number: i-2,
+        type: (i==1||i==2||i==9||i==10) ? "vanish":seatType  ,
+        isAvailable: (i==1||i==2||i==9||i==10) ? false: Math.random() > 0.1 // 70% of seats are available
+      });
+    }
+    else if (row=="B"){
+      seats.push({
+        id: `${showtimeId}-${row}${i}`,
+        row,
+        number: i-1,
+        type: (i==1||i==10) ? "vanish":seatType  ,
+        isAvailable: (i==1||i==10) ? false: Math.random() > 0.1 // 70% of seats are available
+      });
+
+    }
+  }
   });
   
   return seats;

@@ -104,6 +104,28 @@ function RootLayoutNav() {
           headerBackTitle: "Back"
         }}
       />
+      <Stack.Screen 
+        name="admin-options/admin" 
+        options={{ 
+          title: "Admin Dashboard",
+          headerBackTitle: "Back"
+        }}
+      />
+      <Stack.Screen 
+        name="admin-options/add-movie" 
+        options={{ 
+          title: "Add Movie",
+          headerBackTitle: "Back"
+        }}
+      />
+      <Stack.Screen 
+        name="admin-options/edit-movie/[id]" 
+        options={{ 
+          title: "Edit Movie",
+          headerBackTitle: "Back"
+        }}
+      />
+      
       
     </Stack>
   );

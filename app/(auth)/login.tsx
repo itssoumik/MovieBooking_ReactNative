@@ -20,7 +20,11 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    setLoading(true);
+    if (email === 'admin@gmail.com' && password === 'admin') {
+        router.replace("/admin-options/admin");
+    }
+    else{
+      setLoading(true);
     try {
       await auth().signInWithEmailAndPassword(email, password);
       await AsyncStorage.setItem("userEmail", email); // Store email
@@ -57,6 +61,7 @@ export default function LoginScreen() {
       //console.error("Login error:", err);
     } finally {
       setLoading(false);
+    }
     }
   };
 

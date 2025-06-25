@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Tabs, useRouter } from "expo-router";
-import { Home, Ticket, User, Search, Settings } from "lucide-react-native";
+import { Home, Ticket, User, Search, Settings, UserRoundCog } from "lucide-react-native";
 import Colors from "@/constants/colors";
 
 export default function TabLayout() {
@@ -53,6 +53,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <User size={24} color={color} />,
         }}
       />
+      
       
     </Tabs>
   );

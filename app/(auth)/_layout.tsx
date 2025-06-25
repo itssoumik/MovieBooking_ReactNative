@@ -28,22 +28,9 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen
-        name="user-or-admin"
-        options={{
-          title: "User-Or-Admin",
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
         name="login"
         options={{
           title: "Login",
-        }}
-      />
-      <Stack.Screen
-        name="admin-login"
-        options={{
-          title: "Admin Login",
         }}
       />
       <Stack.Screen

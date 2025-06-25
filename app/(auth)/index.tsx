@@ -9,7 +9,7 @@ export default function WelcomeScreen() {
 
   
   const handleLogin = () => {
-    router.push("/(auth)/user-or-admin");
+    router.push("/(auth)/login");
   };
   
   const handleRegister = () => {
@@ -42,7 +42,7 @@ export default function WelcomeScreen() {
           />
           
           <Button
-            title="Create User Account"
+            title="Create Account"
             variant="outline"
             onPress={handleRegister}
             style={styles.button}

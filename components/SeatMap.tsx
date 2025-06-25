@@ -34,40 +34,62 @@ export default function SeatMap({
       
       <ScrollView horizontal>
   <ScrollView contentContainerStyle={styles.seatsContainer}>
-    {rows.map((row) => (
-      <View key={row} style={styles.row}>
-        <Text style={styles.rowLabel}>{row}</Text>
+    {rows.map((row, rowIdx) => (
+      <React.Fragment key={row}>
+        <View style={styles.row}>
+          <Text style={styles.rowLabel}>{row}</Text>
+          <View style={styles.seats}>
+            {seatsByRow[row].map((seat, idx) => {
+              // Pathways after 2nd and 6th seat (0-based index)
+              const isAfterSecond = idx === 2;
+              const isAfterSixth = idx === 6;
 
-        <View style={styles.seats}>
-          {seatsByRow[row].map((seat) => {
-            const isSelected = selectedSeats.some(s => s.id === seat.id);
-
-            return (
-              <Pressable
-                key={seat.id}
-                style={[
-                  styles.seat,
-                  styles[`${seat.type}Seat`],
-                  !seat.isAvailable && styles.unavailableSeat,
-                  isSelected && styles.selectedSeat
-                ]}
-                onPress={() => onToggleSeat(seat)}
-                disabled={!seat.isAvailable}
-              >
-                <Text 
-                  style={[
-                    styles.seatNumber,
-                    !seat.isAvailable && styles.unavailableSeatText,
-                    isSelected && styles.selectedSeatText
-                  ]}
-                >
-                  {seat.number}
-                </Text>
-              </Pressable>
-            );
-          })}
+              return (
+                <React.Fragment key={seat.id}>
+                  {/* Render seat or vanish seat */}
+                  {seat.type === "vanish" ? (
+                    <View
+                      style={[
+                        styles.seat,
+                        styles.vanishSeat
+                      ]}
+                    />
+                  ) : (
+                    <Pressable
+                      style={[
+                        styles.seat,
+                        styles[`${seat.type}Seat`],
+                        !seat.isAvailable && styles.unavailableSeat,
+                        selectedSeats.some(s => s.id === seat.id) && styles.selectedSeat
+                      ]}
+                      onPress={() => onToggleSeat(seat)}
+                      disabled={!seat.isAvailable}
+                    >
+                      <Text 
+                        style={[
+                          styles.seatNumber,
+                          !seat.isAvailable && styles.unavailableSeatText,
+                          selectedSeats.some(s => s.id === seat.id) && styles.selectedSeatText
+                        ]}
+                      >
+                        {seat.number}
+                      </Text>
+                    </Pressable>
+                  )}
+                  {/* Insert pathway after 2nd and 6th seat */}
+                  {(isAfterSecond || isAfterSixth) && (
+                    <View style={styles.pathway} />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </View>
         </View>
-      </View>
+        {/* Insert horizontal pathway between F and G rows */}
+        {row === "F" && (
+          <View style={styles.horizontalPathway} />
+        )}
+      </React.Fragment>
     ))}
   </ScrollView>
 </ScrollView>
@@ -87,6 +109,10 @@ export default function SeatMap({
         <View style={styles.legendItem}>
           <View style={[styles.legendSeat, styles.unavailableLegendSeat]} />
           <Text style={styles.legendText}>Unavailable</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendSeat, styles.premiumSeat]} />
+          <Text style={styles.legendText}>Premium</Text>
         </View>
       </View>
     </View>
@@ -151,6 +177,10 @@ const styles = StyleSheet.create({
   premiumSeat: {
     backgroundColor: "#E6F7FF",
   },
+  vanishSeat: {
+    backgroundColor: Colors.background,
+    // Optionally, you can add opacity: 0 if you want it fully invisible
+  },
   // -
   unavailableSeat: {
     backgroundColor: Colors.inactive,
@@ -199,5 +229,12 @@ const styles = StyleSheet.create({
   legendText: {
     fontSize: 12,
     color: Colors.textSecondary,
+  },
+  pathway: {
+    width: 16, // Adjust width as needed for the pathway
+  },
+  horizontalPathway: {
+    height: 8, // Adjust height as needed for the pathway
+    width: '100%',
   },
 });

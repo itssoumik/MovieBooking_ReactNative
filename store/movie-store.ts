@@ -11,6 +11,9 @@ interface MovieState {
   fetchMovies: () => Promise<void>;
   getMovieById: (id: string) => Promise<Movie | null>;
   filterMovies: (query: string, genres?: string[], languages?: string[]) => void;
+  addMovie: (movie: Movie) => Promise<void>;
+  updateMovie: (id: string, movie: Partial<Movie>) => Promise<void>;
+  deleteMovie: (id: string) => Promise<void>;
 }
 
 export const useMovieStore = create<MovieState>((set, get) => ({
@@ -94,5 +97,80 @@ export const useMovieStore = create<MovieState>((set, get) => ({
     }
 
     set({ filteredMovies: filtered });
+  },
+
+  addMovie: async (movie) => {
+  set({ isLoading: true, error: null });
+
+  try {
+    const docId = `movie_${movie.id}`;
+
+    await firestore().collection("Movies").doc(docId).set(movie);
+
+    const newMovie = { ...movie, id: movie.id };
+
+    set((state) => ({
+      movies: [...state.movies, newMovie],
+      filteredMovies: [...state.movies, newMovie],
+      isLoading: false,
+    }));
+  } catch (error) {
+    set({
+      error: error instanceof Error ? error.message : "Failed to add movie",
+      isLoading: false,
+    });
   }
+},
+
+
+  
+  updateMovie: async (id, movieData) => {
+  set({ isLoading: true, error: null });
+
+  try {
+    await firestore().collection("Movies").doc(`movie_${id}`).update(movieData);
+
+    set((state) => {
+      const updatedMovies = state.movies.map((movie) =>
+        movie.id === id ? { ...movie, ...movieData } : movie
+      );
+
+      return {
+        movies: updatedMovies,
+        filteredMovies: updatedMovies,
+        isLoading: false,
+      };
+    });
+  } catch (error) {
+    set({
+      error: error instanceof Error ? error.message : "Failed to update movie",
+      isLoading: false,
+    });
+  }
+},
+
+
+  
+  deleteMovie: async (id) => {
+  set({ isLoading: true, error: null });
+
+  try {
+    await firestore().collection("Movies").doc(`movie_${id}`).delete();
+
+    set(state => {
+      const updatedMovies = state.movies.filter(movie => movie.id !== id);
+      return {
+        movies: updatedMovies,
+        filteredMovies: updatedMovies,
+        isLoading: false,
+      };
+    });
+  } catch (error) {
+    set({
+      error: error instanceof Error ? error.message : "Failed to delete movie",
+      isLoading: false,
+    });
+  }
+},
+
 }));
