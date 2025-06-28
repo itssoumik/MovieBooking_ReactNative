@@ -1,10 +1,9 @@
 import { Movie,Showtime } from "@/types";
-import { useMovieStore } from "@/store/movie-store";
 
 export const generateShowtimes = (): Showtime[] => {
   const showtimes: Showtime[] = [];
   const theaters = ["1", "2", "3", "4"];
-  const movies = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+  const movies = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"];
   const times = ["09:30 AM", "12:30 PM", "03:30 PM", "06:30 PM"];
   //const { getMovieById, selectedMovie, isLoading } = useMovieStore();
 

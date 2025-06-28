@@ -102,7 +102,7 @@ export default function TheaterScreen() {
           <View>
             <Text style={styles.totalLabel}>Total</Text>
             <Text style={styles.totalAmount}>
-              ₹{selectedShowtime.price * selectedSeats.length}
+              ₹{movie.price * selectedSeats.length}
             </Text>
           </View>
         </View>

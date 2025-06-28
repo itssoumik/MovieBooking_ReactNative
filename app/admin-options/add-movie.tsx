@@ -8,7 +8,7 @@ import {
   Alert
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Film, Clock, Calendar, Link, Plus, X, DollarSign } from "lucide-react-native";
+import { Film, Clock, Calendar, Link, Plus, X, DollarSign, IndianRupee } from "lucide-react-native";
 import { useMovieStore } from "@/store/movie-store";
 import Colors from "@/constants/colors";
 import Input from "@/components/Input";
@@ -24,7 +24,6 @@ export default function AddMovieScreen() {
   const [poster, setPoster] = useState("");
   const [backdrop, setBackdrop] = useState("");
   const [duration, setDuration] = useState("");
-  const [releaseDate, setReleaseDate] = useState("");
   const [price, setPrice] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
@@ -32,6 +31,8 @@ export default function AddMovieScreen() {
   const [newLanguage, setNewLanguage] = useState("");
   const [id, setId] = useState("");
   const [ytCode, setYtCode] = useState("");
+  const [votes, setVotes] = useState("");
+  const [rating, setRating] = useState("");
 
   
   const allGenres = [
@@ -122,8 +123,8 @@ export default function AddMovieScreen() {
         //releaseDate,
         genres: selectedGenres,
         languages: selectedLanguages,
-        rating: 0,
-        votes: 0,
+        rating: parseFloat(rating) || 0,
+        votes: parseInt(votes) || 0,
         price: priceValue
       });
       
@@ -191,19 +192,19 @@ export default function AddMovieScreen() {
         />
         
         <Input
-  label="Movie ID *"
-  placeholder="Unique movie ID (e.g. 1)"
-  value={id}
-  onChangeText={setId}
-  keyboardType="number-pad"
-/>
+          label="Movie ID *"
+          placeholder="Unique movie ID (e.g. 1)"
+          value={id}
+          onChangeText={setId}
+          keyboardType="number-pad"
+        />
 
-<Input
-  label="YouTube Trailer Code"
-  placeholder="Enter YouTube video ID (e.g. dQw4w9WgXcQ)"
-  value={ytCode}
-  onChangeText={setYtCode}
-/>
+        <Input
+          label="YouTube Trailer Code"
+          placeholder="Enter YouTube video ID"
+          value={ytCode}
+          onChangeText={setYtCode}
+        />
 
         
         <Input
@@ -212,7 +213,22 @@ export default function AddMovieScreen() {
           value={price}
           onChangeText={setPrice}
           keyboardType="number-pad"
-          leftIcon={<DollarSign size={20} color={Colors.textSecondary} />}
+          leftIcon={<IndianRupee size={20} color={Colors.textSecondary} />}
+        />
+
+        <Input
+          label="Votes"
+          placeholder="Enter number of votes"
+          value={votes.toString()}
+          onChangeText={text => setVotes(text)}
+          keyboardType="number-pad"
+        />
+        <Input
+          label="Rating"
+          placeholder="Enter movie rating (0-10)"
+          value={rating.toString()}
+          onChangeText={text => setRating(text)}
+          keyboardType="decimal-pad"
         />
       </View>
       

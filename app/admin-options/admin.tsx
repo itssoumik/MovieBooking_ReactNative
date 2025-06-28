@@ -66,7 +66,7 @@ export default function AdminScreen() {
           style={{ backgroundColor: Colors.error , borderColor: Colors.error }}
           textStyle={{ color: Colors.card }}
           icon={<LogOut size={16} color={Colors.card} />}
-          onPress={() => router.push("/(auth)")}
+          onPress={() => router.replace("/(auth)")}
           size="small"
           />
       </View>

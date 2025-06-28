@@ -21,7 +21,13 @@ export default function RegisterScreen() {
   const handleRegistration = async () => {
     
     setLoading(true);
-    try {
+    if(email==="admin@gmail.com"){
+      alert("This email is reserved for admin. Please use a different email.");
+      setLoading(false);
+      return;
+    }
+    else{
+      try {
       await register(username, email, password);
       router.replace("/(tabs)"); // Navigate to main app
     }
@@ -38,6 +44,7 @@ export default function RegisterScreen() {
       }
     } finally {
       setLoading(false);
+    }
     }
   };
 
