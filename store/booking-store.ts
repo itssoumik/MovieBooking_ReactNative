@@ -2,7 +2,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { Booking, Seat, Showtime } from "@/types";
+import firestore from "@react-native-firebase/firestore";
 import { showtimes } from "@/mocks/showtimes";
+import { useMovieStore } from "./movie-store";
+import { theaters } from "@/mocks/theaters";
 
 interface BookingState {
   bookings: Booking[];
@@ -11,251 +14,238 @@ interface BookingState {
   availableSeats: Seat[];
   isLoading: boolean;
   error: string | null;
-  
+
   fetchUserBookings: (userId: string) => Promise<void>;
   selectShowtime: (showtimeId: string) => Promise<void>;
   fetchAvailableSeats: (showtimeId: string) => Promise<void>;
   toggleSeatSelection: (seat: Seat) => void;
   clearSeatSelection: () => void;
-  createBooking: (userId: string) => Promise<Booking | null>;
+  createBooking: (userId: string) => Promise<void>;
   cancelBooking: (bookingId: string) => Promise<void>;
 }
 
-// Generate mock seats for a showtime
 const generateSeats = (showtimeId: string): Seat[] => {
   const seats: Seat[] = [];
   const rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
-  
   rows.forEach(row => {
     for (let i = 1; i <= 10; i++) {
-      const seatType = 
-        
-        row > "F" ? "premium" : "standard";
-      if(row!="A"&& row!="B"){
-      seats.push({
-        id: `${showtimeId}-${row}${i}`,
-        row,
-        number: i,
-        type: seatType,
-        isAvailable: Math.random() > 0.3 // 70% of seats are available
-      });
+      const type = row > "F" ? "premium" : "standard";
+      if (row !== "A" && row !== "B") {
+        seats.push({
+          id: `${showtimeId}-${row}${i}`,
+          row,
+          number: i,
+          type,
+          isAvailable: Math.random() > 0.3
+        });
+      } else if (row === "A") {
+        seats.push({
+          id: `${showtimeId}-${row}${i}`,
+          row,
+          number: i - 2,
+          type: [1, 2, 9, 10].includes(i) ? "vanish" : type,
+          isAvailable: [1, 2, 9, 10].includes(i) ? false : Math.random() > 0.1
+        });
+      } else if (row === "B") {
+        seats.push({
+          id: `${showtimeId}-${row}${i}`,
+          row,
+          number: i - 1,
+          type: [1, 10].includes(i) ? "vanish" : type,
+          isAvailable: [1, 10].includes(i) ? false : Math.random() > 0.1
+        });
+      }
     }
-    else if (row=="A"){
-      seats.push({
-        id: `${showtimeId}-${row}${i}`,
-        row,
-        number: i-2,
-        type: (i==1||i==2||i==9||i==10) ? "vanish":seatType  ,
-        isAvailable: (i==1||i==2||i==9||i==10) ? false: Math.random() > 0.1 // 70% of seats are available
-      });
-    }
-    else if (row=="B"){
-      seats.push({
-        id: `${showtimeId}-${row}${i}`,
-        row,
-        number: i-1,
-        type: (i==1||i==10) ? "vanish":seatType  ,
-        isAvailable: (i==1||i==10) ? false: Math.random() > 0.1 // 70% of seats are available
-      });
-
-    }
-  }
   });
-  
   return seats;
 };
-
-// Mock bookings
-const mockBookings: Booking[] = [
-  {
-    id: "1",
-    userId: "1",
-    movieId: "1",
-    theaterId: "1",
-    showtimeId: "1",
-    seats: ["1-A1", "1-A2"],
-    totalAmount: 300,
-    bookingDate: "2023-05-15",
-    status: "confirmed"
-  }
-];
 
 export const useBookingStore = create<BookingState>()(
   persist(
     (set, get) => ({
-      bookings: mockBookings,
+      bookings: [],
       selectedShowtime: null,
       selectedSeats: [],
       availableSeats: [],
       isLoading: false,
       error: null,
-      
+
       fetchUserBookings: async (userId: string) => {
-        set({ isLoading: true, error: null });
-        
+        set({ isLoading: true });
         try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Filter bookings for the user
-          const userBookings = mockBookings.filter(booking => booking.userId === userId);
-          
+          const snapshot = await firestore()
+            .collection("Users")
+            .doc(userId)
+            .collection("Bookings")
+            .get();
+
+          const bookings = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as Booking[];
+
+          set({ bookings, isLoading: false });
+        } catch (err) {
           set({
-            bookings: userBookings,
-            isLoading: false
-          });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : "Failed to fetch bookings",
+            error: "Failed to fetch bookings",
             isLoading: false
           });
         }
       },
-      
+
       selectShowtime: async (showtimeId: string) => {
         set({ isLoading: true, error: null });
-        
         try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
           const showtime = showtimes.find(s => s.id === showtimeId) || null;
-          
-          set({
-            selectedShowtime: showtime,
-            selectedSeats: [],
-            isLoading: false
-          });
-          
+          set({ selectedShowtime: showtime, selectedSeats: [], isLoading: false });
           if (showtime) {
             get().fetchAvailableSeats(showtimeId);
           }
         } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : "Failed to select showtime",
-            isLoading: false
-          });
+          set({ error: "Failed to select showtime", isLoading: false });
         }
       },
-      
+
       fetchAvailableSeats: async (showtimeId: string) => {
-        set({ isLoading: true, error: null });
-        
+        set({ isLoading: true });
         try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 800));
-          
-          // Generate mock seats
-          const seats = generateSeats(showtimeId);
-          
-          set({
-            availableSeats: seats,
-            isLoading: false
-          });
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : "Failed to fetch seats",
-            isLoading: false
-          });
+          await new Promise(res => setTimeout(res, 500));
+          set({ availableSeats: generateSeats(showtimeId), isLoading: false });
+        } catch {
+          set({ error: "Failed to fetch seats", isLoading: false });
         }
       },
-      
+
       toggleSeatSelection: (seat: Seat) => {
         if (!seat.isAvailable) return;
-        
         const { selectedSeats } = get();
-        const isSeatSelected = selectedSeats.some(s => s.id === seat.id);
-        
-        if (isSeatSelected) {
-          set({
-            selectedSeats: selectedSeats.filter(s => s.id !== seat.id)
-          });
+        const exists = selectedSeats.some(s => s.id === seat.id);
+        if (exists) {
+          set({ selectedSeats: selectedSeats.filter(s => s.id !== seat.id) });
         } else {
-          set({
-            selectedSeats: [...selectedSeats, seat]
-          });
+          set({ selectedSeats: [...selectedSeats, seat] });
         }
       },
-      
+
       clearSeatSelection: () => {
-        set({
-          selectedSeats: [],
-          selectedShowtime: null
-        });
+        set({ selectedSeats: [], selectedShowtime: null });
       },
-      
-      createBooking: async (userId: string) => {
-        const { selectedShowtime, selectedSeats } = get();
-        
-        if (!selectedShowtime || selectedSeats.length === 0) {
-          set({
-            error: "No showtime or seats selected"
-          });
-          return null;
-        }
-        
-        set({ isLoading: true, error: null });
-        
-        try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1500));
-          
-          const newBooking: Booking = {
-            id: (Math.random() * 1000).toString(),
-            userId,
-            movieId: selectedShowtime.movieId,
-            theaterId: selectedShowtime.theaterId,
-            showtimeId: selectedShowtime.id,
-            seats: selectedSeats.map(seat => seat.id),
-            totalAmount: selectedSeats.length * selectedShowtime.price,
-            bookingDate: new Date().toISOString().split("T")[0],
-            status: "confirmed"
-          };
-          
-          set(state => ({
-            bookings: [...state.bookings, newBooking],
-            selectedSeats: [],
-            selectedShowtime: null,
-            isLoading: false
-          }));
-          
-          return newBooking;
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : "Failed to create booking",
-            isLoading: false
-          });
-          return null;
-        }
-      },
-      
+createBooking: async (userId: string) => {
+  const { selectedShowtime, selectedSeats } = get();
+  const { getMovieById } = useMovieStore.getState();
+
+  console.log(">>> createBooking called");
+  console.log("User ID:", userId);
+  console.log("Selected Showtime:", selectedShowtime);
+  console.log("Selected Seats:", selectedSeats);
+
+  if (!userId || !selectedShowtime || selectedSeats.length === 0) {
+    console.warn("Missing user ID, showtime, or no seats selected");
+    return;
+  }
+
+  set({ isLoading: true });
+
+  try {
+    // Fetch movie from Firestore
+    const movie = await getMovieById(selectedShowtime.movieId);
+    if (!movie) throw new Error("Movie not found");
+
+    // Find theater from local file
+    const theater = theaters.find(t => t.id === selectedShowtime.theaterId);
+    if (!theater) throw new Error("Theater not found");
+
+    const bookingRef = firestore()
+      .collection("Users")
+      .doc(userId)
+      .collection("Bookings")
+      .doc();
+
+    // Format date
+    const dateObj = new Date(selectedShowtime.date);
+    const formattedDay = dateObj.toLocaleDateString("en-US", { weekday: "long" });
+    const formattedDate = dateObj.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    });
+
+    const seatLabels = selectedSeats.map(seat => `${seat.row}${seat.number}`);
+    const totalAmount = movie.price * selectedSeats.length+20;
+
+    const bookingData: Booking = {
+      id: bookingRef.id,
+      userId,
+      seats: seatLabels,
+      totalAmount,
+      bookingDate: new Date().toISOString(),
+      status: "confirmed",
+
+      // Firestore flat fields
+      poster: movie.poster || "",
+      movieName: movie.title,
+      backdrop: movie.backdrop || "",
+      location: theater.location,
+      theater: theater.name,
+      day: formattedDay,
+      date: formattedDate,
+      time: selectedShowtime.time
+    };
+
+    console.log(">>> Final bookingData:", bookingData);
+
+    await bookingRef.set(bookingData);
+
+    console.log(">>> Booking successfully written");
+
+    set(state => ({
+      bookings: [...state.bookings, bookingData as Booking],
+      selectedSeats: [],
+      selectedShowtime: null,
+      isLoading: false
+    }));
+  } catch (err) {
+    console.error(">>> Firestore write failed:", err);
+    set({
+      error: err instanceof Error ? err.message : "Booking failed",
+      isLoading: false
+    });
+  }
+},
+
+
+
+
+
       cancelBooking: async (bookingId: string) => {
-        set({ isLoading: true, error: null });
-        
+        set({ isLoading: true });
         try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          set(state => ({
-            bookings: state.bookings.map(booking => 
-              booking.id === bookingId 
-                ? { ...booking, status: "cancelled" } 
-                : booking
+          const { bookings } = get();
+          const booking = bookings.find(b => b.id === bookingId);
+          if (!booking) return;
+
+          await firestore()
+            .collection("Users")
+            .doc(booking.userId)
+            .collection("Bookings")
+            .doc(bookingId)
+            .update({ status: "cancelled" });
+
+          set({
+            bookings: bookings.map(b =>
+              b.id === bookingId ? { ...b, status: "cancelled" } : b
             ),
             isLoading: false
-          }));
-        } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : "Failed to cancel booking",
-            isLoading: false
           });
+        } catch {
+          set({ error: "Failed to cancel booking", isLoading: false });
         }
       }
     }),
     {
       name: "booking-storage",
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({
+      partialize: state => ({
         bookings: state.bookings
       })
     }

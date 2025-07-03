@@ -12,7 +12,7 @@ export const unstable_settings = {
   initialRouteName: "(tabs)",
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// Prevent the splash screen from auto-hiding before assets load
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -46,87 +46,78 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-   const [initializing, setInitializing] = useState(true);
-   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
-
-  // Handle user state changes
-  function handleAuthStateChanged(user: FirebaseAuthTypes.User | null) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
 
   useEffect(() => {
-    const subscriber = onAuthStateChanged(getAuth(), handleAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (newUser) => {
+      // Only update if changed
+      setUser((prevUser) => {
+        if (prevUser?.uid !== newUser?.uid) {
+          return newUser;
+        }
+        return prevUser;
+      });
+
+      // Mark initialization as complete
+      setInitializing(false);
+    });
+
+    return unsubscribe;
   }, []);
 
+  // Show nothing while initializing
   if (initializing) return null;
+
   return (
     <Stack
       screenOptions={{
-        headerStyle: {
-          backgroundColor: Colors.background,
-        },
+        headerStyle: { backgroundColor: Colors.background },
         headerTintColor: Colors.text,
-        headerTitleStyle: {
-          fontWeight: "600",
-        },
-        contentStyle: {
-          backgroundColor: Colors.background,
-        },
+        headerTitleStyle: { fontWeight: "600" },
+        contentStyle: { backgroundColor: Colors.background },
       }}
     >
+      {/* Screens for authenticated and unauthenticated flows */}
       <Stack.Protected guard={!!user}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack.Protected>
-
       <Stack.Protected guard={!user}>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack.Protected>
-      <Stack.Screen 
-        name="movie/[id]" 
-        options={{ 
-          title: "Movie Details",
-          headerBackTitle: "Back"
-        }} 
+
+      {/* Public screens */}
+      <Stack.Screen
+        name="movie/[id]"
+        options={{ title: "Movie Details", headerBackTitle: "Back" }}
       />
-      <Stack.Screen 
-        name="profile/edit" 
-        options={{ 
-          title: "Edit Profile",
-          headerBackTitle: "Back"
-        }}
+      <Stack.Screen
+        name="profile/edit"
+        options={{ title: "Edit Profile", headerBackTitle: "Back" }}
       />
-      <Stack.Screen 
-        name="theater/[id]" 
-        options={{ 
-          title: "Seat Map",
-          headerBackTitle: "Back"
-        }}
+      <Stack.Screen
+        name="theater/[id]"
+        options={{ title: "Seat Map", headerBackTitle: "Back" }}
       />
-      <Stack.Screen 
-        name="admin-options/admin" 
-        options={{ 
-          title: "Admin Dashboard",
-          headerBackTitle: "Back"
-        }}
+      <Stack.Screen
+        name="booking/[id]"
+        options={{ title: "Booking Details", headerBackTitle: "Back" }}
       />
-      <Stack.Screen 
-        name="admin-options/add-movie" 
-        options={{ 
-          title: "Add Movie",
-          headerBackTitle: "Back"
-        }}
+
+      {/* Admin screens */}
+      <Stack.Screen
+        name="admin-options/admin"
+        options={{ title: "Admin Dashboard", headerBackTitle: "Back" }}
       />
-      <Stack.Screen 
-        name="admin-options/edit-movie/[id]" 
-        options={{ 
-          title: "Edit Movie",
-          headerBackTitle: "Back"
-        }}
+      <Stack.Screen
+        name="admin-options/add-movie"
+        options={{ title: "Add Movie", headerBackTitle: "Back" }}
       />
-      
-      
+      <Stack.Screen
+        name="admin-options/edit-movie/[id]"
+        options={{ title: "Edit Movie", headerBackTitle: "Back" }}
+      />
     </Stack>
   );
 }

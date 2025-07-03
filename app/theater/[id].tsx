@@ -10,7 +10,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useBookingStore } from "@/store/booking-store";
 import { useMovieStore } from "@/store/movie-store";
 import { theaters } from "@/mocks/theaters";
-import { showtimes } from "@/mocks/showtimes";
 import Colors from "@/constants/colors";
 import SeatMap from "@/components/SeatMap";
 import Button from "@/components/Button";
@@ -18,8 +17,7 @@ import Button from "@/components/Button";
 export default function TheaterScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  
-  
+
   const { 
     selectedShowtime, 
     selectedSeats, 
@@ -27,39 +25,36 @@ export default function TheaterScreen() {
     toggleSeatSelection,
     isLoading 
   } = useBookingStore();
-  
+
   const { movies } = useMovieStore();
-  
+
   const [theater, setTheater] = useState(theaters[0]);
   const [movie, setMovie] = useState(movies[0]);
-  
+
   useEffect(() => {
-    // Find theater by ID
     const foundTheater = theaters.find(t => t.id === id);
-    if (foundTheater) {
-      setTheater(foundTheater);
-    }
-    
-    // Find movie from selected showtime
+    if (foundTheater) setTheater(foundTheater);
+
     if (selectedShowtime) {
       const foundMovie = movies.find(m => m.id === selectedShowtime.movieId);
-      if (foundMovie) {
-        setMovie(foundMovie);
-      }
+      if (foundMovie) setMovie(foundMovie);
     }
   }, [id, selectedShowtime, movies]);
-  
+
+  // Move redirect logic into effect
+  useEffect(() => {
+    if (!selectedShowtime && movie?.id) {
+      router.replace(`/movie/${movie.id}`);
+    }
+  }, [selectedShowtime, movie?.id]);
+
   const handleProceedToCheckout = () => {
-    //router.push("/checkout");
-    null;
+    router.push("/checkout");
   };
 
-  
-  if (!selectedShowtime) {
-    router.replace(`/movie/${movie.id}`);
-    return null;
-  }
-  
+  // Prevent render crash if no showtime and redirection is pending
+  if (!selectedShowtime) return null;
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollContainer}>
@@ -74,7 +69,7 @@ export default function TheaterScreen() {
             })} • {selectedShowtime.time}
           </Text>
         </View>
-        
+
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={Colors.primary} />
@@ -87,7 +82,7 @@ export default function TheaterScreen() {
           />
         )}
       </ScrollView>
-      
+
       <View style={styles.footer}>
         <View style={styles.summaryContainer}>
           <View>
@@ -98,7 +93,7 @@ export default function TheaterScreen() {
               {selectedSeats.map(seat => `${seat.row}${seat.number}`).join(", ")}
             </Text>
           </View>
-          
+
           <View>
             <Text style={styles.totalLabel}>Total</Text>
             <Text style={styles.totalAmount}>
@@ -106,7 +101,7 @@ export default function TheaterScreen() {
             </Text>
           </View>
         </View>
-        
+
         <Button
           title="Proceed to Checkout"
           onPress={handleProceedToCheckout}
@@ -117,6 +112,9 @@ export default function TheaterScreen() {
     </View>
   );
 }
+
+// styles remain unchanged...
+
 
 const styles = StyleSheet.create({
   container: {

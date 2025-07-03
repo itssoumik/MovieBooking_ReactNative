@@ -33,6 +33,10 @@ export interface Showtime {
   date: string;
   time: string;
   price: number;
+
+  // Add these optional fields
+  movie?: Movie;
+  theater?: Theater;
 }
 
 export interface Seat {
@@ -43,14 +47,23 @@ export interface Seat {
   isAvailable: boolean;
 }
 
-export interface Booking {
+export interface BookingForFirestore {
   id: string;
-  userId: string;
-  movieId: string;
-  theaterId: string;
-  showtimeId: string;
-  seats: string[]; // Array of seat IDs
+  seats: string[];
   totalAmount: number;
-  bookingDate: string;
   status: "confirmed" | "cancelled";
+  movieName: string;
+  backdrop: string;
+  poster: string;
+  location: string;
+  theater: string;
+  day: string;
+  date: string;
+  time: string;
 }
+
+export interface Booking extends BookingForFirestore {
+  userId: string;
+  bookingDate: string;
+}
+
