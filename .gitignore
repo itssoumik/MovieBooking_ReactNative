@@ -40,5 +40,3 @@ yarn-error.*
 google-services.json
 GoogleService-Info.plist
 
-# Ignore utils folder
-utils/
