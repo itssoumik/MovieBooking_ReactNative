@@ -88,6 +88,7 @@ function RootLayoutNav() {
       </Stack.Protected>
 
       {/* Public screens */}
+      <Stack.Protected guard={!!user}>
       <Stack.Screen
         name="movie/[id]"
         options={{ title: "Movie Details", headerBackTitle: "Back" }}
@@ -104,13 +105,18 @@ function RootLayoutNav() {
         name="booking/[id]"
         options={{ title: "Booking Details", headerBackTitle: "Back" }}
       />
-
-      {/* Admin screens */}
+      <Stack.Screen
+        name="checkout"
+        options={{ title: "Checkout", headerBackTitle: "Back" }}
+      />
+      </Stack.Protected>
+      
+      {/* Authenticated admin screens */}
       <Stack.Screen
         name="admin-options/admin"
         options={{ title: "Admin Dashboard", headerBackTitle: "Back" }}
       />
-      <Stack.Screen
+       <Stack.Screen
         name="admin-options/add-movie"
         options={{ title: "Add Movie", headerBackTitle: "Back" }}
       />

@@ -4,7 +4,7 @@
     "slug": "ShowBooking",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/App-logo.png",
+    "icon": "./assets/images/FinalIcon.png",
     "scheme": "showbooking",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,7 +15,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/App-logo.png",
+        "foregroundImage": "./assets/images/FinalIcon.png",
         "backgroundColor": "#ff6b00"
       },
       "edgeToEdgeEnabled": true,
@@ -34,8 +34,8 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/App-logo.png",
-          "imageWidth": 200,
+          "image": "./assets/images/FinalSplash.png",
+          "imageWidth": 300,
           "resizeMode": "contain",
           "backgroundColor": "#ff6b00"
         }
