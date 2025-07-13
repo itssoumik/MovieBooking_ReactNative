@@ -12,6 +12,8 @@ import { useMovieStore } from "@/store/movie-store";
 import { useAuthStore } from "@/store/auth-store";
 import Colors from "@/constants/colors";
 import Button from "@/components/Button";
+import RazorpayCheckout from "react-native-razorpay";
+import { or } from "@react-native-firebase/firestore";
 
 export default function CheckoutScreen() {
   const router = useRouter();
@@ -57,29 +59,38 @@ export default function CheckoutScreen() {
   console.log("Total Amount:", totalAmount);
 
   const handlePayment = async () => {
-    setIsProcessing(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      await createBooking(user.id);
-      // Alert.alert(
-      //   "Booking Confirmed",
-      //   "Your booking has been confirmed successfully!",
-      //   [
-      //     {
-      //       text: "Go to Bookings",
-      //       onPress: () => {
-      //         router.replace("/(tabs)/bookings");
-      //       }
-      //     }
-      //   ]
-      // );
-      router.replace("/(tabs)");
-    } catch (error) {
-      Alert.alert("Booking Failed", error instanceof Error ? error.message : "Try again.");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  setIsProcessing(true);
+  try {
+    const options = {
+      key: "rzp_test_DdTMMpZv7X2aTQ",
+      amount: (totalAmount + 20) * 100,
+      currency: "INR",
+      name: "Grab Your Show",
+      description: "Payment for movie tickets",
+      image: 'https://res.cloudinary.com/dim7h6yym/image/upload/v1752056462/FinalIcon_pwmgw5.png',
+      prefill: {
+        name: user.name,
+        email: user.id,
+        contact: '8013934567',
+      },
+      theme: {
+        color: Colors.background,
+      },
+    };
+
+    const data = await RazorpayCheckout.open(options as any);
+    console.log("Payment Success:", data);
+    await createBooking(user.id);
+    router.replace("/(tabs)/bookings");
+  } catch (error) {
+    console.error("Payment Failed:", error);
+    Alert.alert("Payment Failed", "There was an issue processing your payment.");
+  } finally {
+    setIsProcessing(false);
+  }
+};
+
+
 
   return (
     <ScrollView style={styles.container}>
@@ -219,3 +230,4 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
 });
+
