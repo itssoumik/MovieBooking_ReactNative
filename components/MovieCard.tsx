@@ -8,12 +8,14 @@ import Colors from "@/constants/colors";
 interface MovieCardProps {
   movie: Movie;
   size?: "small" | "large";
+  press?: true | false;
 }
 
-export default function MovieCard({ movie, size = "small" }: MovieCardProps) {
+export default function MovieCard({ movie, size = "small" , press= true}: MovieCardProps) {
   const router = useRouter();
   
   const handlePress = () => {
+
     router.push(`/movie/${movie.id}` );
   };
   

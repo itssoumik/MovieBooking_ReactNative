@@ -4,12 +4,13 @@ import Colors from "@/constants/colors";
 import auth from '@react-native-firebase/auth';
 import { FirebaseError } from "firebase/app";
 import { useRouter } from "expo-router";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
+import { Eye, EyeOff, Lock, Mail, } from "lucide-react-native";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import firestore from "@react-native-firebase/firestore";
 import { useAuthStore } from "@/store/auth-store";
+import colors from "@/constants/colors";
 
 export default function LoginScreen() {
   //const auth = getAuth();
@@ -64,6 +65,8 @@ export default function LoginScreen() {
     }
     }
   };
+
+  
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);

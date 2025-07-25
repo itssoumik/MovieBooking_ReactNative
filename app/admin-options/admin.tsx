@@ -77,7 +77,7 @@ export default function AdminScreen() {
         contentContainerStyle={styles.moviesList}
         renderItem={({ item }) => (
           <View style={styles.movieItem}>
-            <MovieCard movie={item} size="large" />
+            <MovieCard movie={item} size="large"  />
             
             <View style={styles.actionsContainer}>
               <TouchableOpacity 
