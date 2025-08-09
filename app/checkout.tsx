@@ -62,7 +62,7 @@ export default function CheckoutScreen() {
   setIsProcessing(true);
   try {
     const options = {
-      key: "rzp_test_DdTMMpZv7X2aTQ",
+      key: "your_razorpay_key",
       amount: (totalAmount + 20) * 100,
       currency: "INR",
       name: "Grab Your Show",
